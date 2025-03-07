@@ -1,3 +1,5 @@
 {
-  "item.tutorialmod.iron_rake": "Iron rake"
+  "item.tutorialmod.iron_rake": "Iron rake",
+  "tooltip.tutorialmod.iron_rake.tooltip": "This rake plow §6§o3x3§r area at a time",
+  "tooltip.tutorialmod.iron_rake": "Press §nShift§r for more info!"
 }

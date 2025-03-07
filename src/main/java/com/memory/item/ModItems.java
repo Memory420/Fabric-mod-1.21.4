@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 public class ModItems {
 
-    public static final Item IRON_RAKE = register("iron_rake", RakeItem::new, new Item.Settings().maxDamage(128));
+    public static final Item IRON_RAKE = register("iron_rake", RakeItem::new, new Item.Settings());
 
     public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
         RegistryKey<Item> itemKey = RegistryKey.of(
