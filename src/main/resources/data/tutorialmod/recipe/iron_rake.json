@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iIi",
+    "i/i",
+    " / "
+  ],
+  "key": {
+    "i": "minecraft:iron_ingot",
+    "I": "minecraft:iron_block",
+    "/": "minecraft:stick"
+  },
+  "result": {
+    "id": "tutorialmod:iron_rake",
+    "count": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": "tutorialmod:iron_rake",
+  "result": {
+    "id": "minecraft:iron_nugget"
+  },
+  "experience": 1,
+  "cookingtime": 200
+}
