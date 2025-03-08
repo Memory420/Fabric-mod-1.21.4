@@ -1,5 +1,6 @@
 {
   "item.tutorialmod.iron_rake": "Железные грабли",
   "tooltip.tutorialmod.iron_rake.tooltip": "Эти грабли вспахивают область §6§o3х3§r за раз",
-  "tooltip.tutorialmod.iron_rake": "Зажми §nShift§r для подробностей!"
+  "tooltip.tutorialmod.iron_rake": "Зажми §nShift§r для подробностей!",
+  "effect.tutorialmod.tesla_syndrome": "Синдром Теслы"
 }

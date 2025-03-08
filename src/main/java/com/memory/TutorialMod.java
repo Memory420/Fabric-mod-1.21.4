@@ -1,5 +1,6 @@
 package com.memory;
 
+import com.memory.effect.ModEffects;
 import com.memory.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
@@ -12,6 +13,7 @@ public class TutorialMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ModEffects.registerEffects(); //!!!
 		ModItems.initialize();
 		LOGGER.info("Registering Mod Items 👍");
 	}
