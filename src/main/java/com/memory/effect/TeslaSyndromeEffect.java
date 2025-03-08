@@ -1,6 +1,5 @@
 package com.memory.effect;
 
-import net.minecraft.client.font.UnihexFont;
 import net.minecraft.entity.*;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
@@ -24,12 +23,6 @@ public class TeslaSyndromeEffect extends StatusEffect {
     private static final double THUNDER_PENALTY = 0.1;
     private static final double MIN_HEIGHT_PENALTY = 0.02;
     private static final double MAX_HEIGHT_PENALTY = 0.5;
-    private static final double IRON_HELMET_PENALTY = 0.2;
-    private static final double GOLD_HELMET_PENALTY = 0.4;
-    private static final double LEATHER_HELMET_BONUS = -0.05;
-    private static final double DIAMOND_HELMET_BONUS = -0.2;
-    private static final double CHAINMAIL_HELMET_PENALTY = 0.15;
-    private static final double NETHERITE_HELMET_BONUS = -0.3;
 
     private static final int[] COOLDOWN_LEVELS = {50, 40, 30, 25, 20, 15, 10, 5, 4, 3, 2, 1};
 
@@ -39,11 +32,10 @@ public class TeslaSyndromeEffect extends StatusEffect {
             return true;
         }
         if (entity.age % getCooldown(amplifier) == 0) {
-            if (shouldLightingStrike(world, entity, amplifier)) {
-                summonLighting(world, entity);
+            if (shouldLightningStrike(world, entity, amplifier)) {
+                summonLightning(world, entity);
             }
         }
-
         return super.applyUpdateEffect(world, entity, amplifier);
     }
 
@@ -51,12 +43,20 @@ public class TeslaSyndromeEffect extends StatusEffect {
     public boolean canApplyUpdateEffect(int duration, int amplifier) {
         return true;
     }
-    private static boolean shouldLightingStrike(ServerWorld world, LivingEntity entity, int amplifier) {
-        if (entity.getPos().getY() < 20) {
+
+    private static boolean shouldLightningStrike(ServerWorld world, LivingEntity entity, int amplifier) {
+        if (entity.getPos().getY() < 0) {
+            if (entity instanceof PlayerEntity player) {
+                player.sendMessage(Text.literal("0 " + getCooldown(amplifier)), false);
+            }
             return false;
         }
+
         double chance = BASE_LIGHTNING_CHANCE;
         if (entity.isSubmergedInWater()){
+            if (entity instanceof PlayerEntity player) {
+                player.sendMessage(Text.literal("0 " + getCooldown(amplifier)), false);
+            }
             return false;
         }
         if (world.isSkyVisible(entity.getBlockPos())){
@@ -72,64 +72,70 @@ public class TeslaSyndromeEffect extends StatusEffect {
             chance += THUNDER_PENALTY;
         }
 
+        double helmetFactor = 1.0;
         Item helmet = entity.getEquippedStack(EquipmentSlot.HEAD).getItem();
         if (helmet == Items.LEATHER_HELMET){
-            chance += LEATHER_HELMET_BONUS;
+            helmetFactor = 0.95;
         } else if (helmet == Items.GOLDEN_HELMET){
-            chance += GOLD_HELMET_PENALTY;
+            helmetFactor = 1.4;
         } else if (helmet == Items.IRON_HELMET){
-            chance += IRON_HELMET_PENALTY;
+            helmetFactor = 1.2;
         } else if (helmet == Items.DIAMOND_HELMET){
-            chance += DIAMOND_HELMET_BONUS;
+            helmetFactor = 0.8;
         } else if (helmet == Items.NETHERITE_HELMET){
-            chance += NETHERITE_HELMET_BONUS;
-            chance = chance / 2;
+            helmetFactor = 0.7;
         } else if (helmet == Items.CHAINMAIL_HELMET){
-            chance += CHAINMAIL_HELMET_PENALTY;
+            helmetFactor = 1.15;
         }
+        chance *= helmetFactor;
         chance += getChanceByHeight(entity);
 
-        if (chance < MINIMUM_CHANCE){
+        if (chance < MINIMUM_CHANCE) {
             chance = MINIMUM_CHANCE;
         }
         chance = truncateToTwoDecimals(chance);
-        if (entity instanceof PlayerEntity player){
+
+        if (entity instanceof PlayerEntity player) {
             player.sendMessage(Text.literal(String.valueOf(chance) + " " + getCooldown(amplifier)), false);
         }
         return world.getRandom().nextDouble() < chance;
     }
 
-    private static void summonLighting(ServerWorld world, LivingEntity entity) {
+    private static void summonLightning(ServerWorld world, LivingEntity entity) {
         LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
         lightning.refreshPositionAfterTeleport(entity.getBlockPos().toCenterPos());
         world.spawnEntity(lightning);
     }
+
     private static double getChanceByHeight(LivingEntity entity) {
         double height = entity.getPos().getY();
-        if (height < 20) return 0;
+        if (height < 0) {
+            return 0;
+        }
+        if (height < 20) {
+            return (height / 20.0) * MIN_HEIGHT_PENALTY;
+        }
         return getLightningChanceByHeight(height);
     }
-
 
     private static double getLightningChanceByHeight(double y) {
         double minY = 40;
         double maxY = 320;
-
         if (y <= minY) return MIN_HEIGHT_PENALTY;
         if (y >= maxY) return MAX_HEIGHT_PENALTY;
-
         return MIN_HEIGHT_PENALTY + (MAX_HEIGHT_PENALTY - MIN_HEIGHT_PENALTY) * ((y - minY) / (maxY - minY));
     }
 
     private static int getCooldown(int amplifier) {
-        if (amplifier == 0){
+        if (amplifier == 0) {
             return DEFAULT_COOLDOWN;
         }
-        if (amplifier >= COOLDOWN_LEVELS.length){
+        if (amplifier >= COOLDOWN_LEVELS.length) {
             return 1;
         }
         return COOLDOWN_LEVELS[amplifier + 1];
     }
+
     private static double truncateToTwoDecimals(double value) {
         return Math.floor(value * 100) / 100;
     }
